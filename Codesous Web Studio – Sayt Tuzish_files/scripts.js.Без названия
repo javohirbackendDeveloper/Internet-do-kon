@@ -1,0 +1,57 @@
+/**
+* More Menu
+*/
+jQuery(function($){
+	"use strict";
+	// AOS
+	AOS.init();
+
+	$(document).ready(function() {
+		$(window).breakpoints();
+	});
+	/**
+	* More Menu
+	*/
+	function calcWidth() {
+		var navwidth = 0;
+		var morewidth = $('#primary-menu .more').outerWidth(true);
+		var availablespace = $('#primary-menu').outerWidth(true) - morewidth;
+
+		// Get width of all list elements except for 'more'.
+		$('#primary-menu > ul > li:not(.more)').each(function() {
+		navwidth += $(this).outerWidth(true);
+		});
+
+		if (navwidth > availablespace) {
+		var lastItem = $('#primary-menu > ul > li:not(.more)').last();
+		lastItem.attr('data-width', lastItem.outerWidth(true));
+		// If there's no ".more" element, make it.
+		if( !$( 'li.more' ).length ){
+					$( '#primary-menu > ul' ).append( '<li class="more page_item_has_children"><a><span class="fa fa-ellipsis-h"></span></a><ul class="children"></ul></li>' );
+				}
+		lastItem.prependTo($('#primary-menu .more > ul'));
+		if( lastItem.hasClass( 'page_item_has_children' )) {
+			var subMenu = lastItem.find( '.children' );
+			subMenu.appendTo( lastItem );
+		}
+		// Recalculate after every stow operation.
+		calcWidth();
+		} else {
+			var firstMoreElement = $('#primary-menu > ul li.more li').first();
+			if (navwidth + firstMoreElement.data('width') < availablespace) {
+			firstMoreElement.insertBefore($('#primary-menu .more'));
+			}
+		}
+		if ($('.more li').length > 0) {
+			$('.more').css('display', 'inline-block');
+			$( '.more' ).css( 'cursor', 'pointer');
+		} else {
+			$('.more').css('display', 'none');
+		}
+	}
+	$(window).on('resize load', function() {
+		$(window).breakpoints('greaterEqualTo', 'lg', function() {
+			calcWidth();
+		})
+	});
+});
